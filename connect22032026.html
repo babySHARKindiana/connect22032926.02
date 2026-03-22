@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подключение к серверу GMod | Indiana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0f0f1f 100%);
+            color: #e0e0ff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(20, 10, 35, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 30px rgba(156, 39, 176, 0.3);
+            border: 1px solid #9c27b0;
+        }
+        
+        .logo {
+            font-size: 48px;
+            color: #9c27b0;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(156, 39, 176, 0.7);
+            animation: glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 15px rgba(156, 39, 176, 0.7); }
+            50% { text-shadow: 0 0 25px rgba(156, 39, 176, 1), 0 0 10px rgba(156, 39, 176, 0.5); }
+        }
+        
+        h1 {
+            color: #aa6dc9;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #b77ee6, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .server-info {
+            background: rgba(156, 39, 176, 0.1);
+            border-left: 4px solid #9c27b0;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            border-radius: 0 10px 10px 0;
+            box-shadow: 0 2px 10px rgba(156, 39, 176, 0.2);
+        }
+        
+        .server-info h2 {
+            color: #c084fc;
+            margin-bottom: 15px;
+        }
+        
+        .server-info p {
+            margin: 10px 0;
+            color: #d0b0ff;
+        }
+        
+        .server-info strong {
+            color: #c084fc;
+        }
+        
+        .ip-address {
+            font-family: monospace;
+            font-size: 24px;
+            background: #1a0a2e;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: inline-block;
+            border: 2px solid #9c27b0;
+            color: #c084fc;
+            box-shadow: 0 0 10px rgba(156, 39, 176, 0.3);
+        }
+        
+        .connect-btn {
+            background: linear-gradient(45deg, #8e24aa, #6a1b9a);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 25px 0;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+        }
+        
+        .connect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.8);
+            background: linear-gradient(45deg, #ab47bc, #7b1fa2);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(45deg, #7b1fa2, #6a1b9a);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(45deg, #8e24aa, #7b1fa2);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
+        }
+        
+        .instructions {
+            background: rgba(156, 39, 176, 0.1);
+            border-left: 4px solid #c084fc;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .instructions h2 {
+            color: #c084fc;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        
+        .instructions li {
+            margin: 10px 0;
+            color: #d0b0ff;
+        }
+        
+        .instructions code {
+            background: #1a0a2e;
+            padding: 4px 8px;
+            border-radius: 5px;
+            color: #c084fc;
+            border: 1px solid #9c27b0;
+        }
+        
+        .instructions kbd {
+            background: #1a0a2e;
+            border-radius: 5px;
+            padding: 4px 8px;
+            color: #c084fc;
+            border: 1px solid #9c27b0;
+            font-family: monospace;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #7c6a9e;
+            font-size: 14px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(45deg, #6a1b9a, #8e24aa);
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); box-shadow: 0 0 20px rgba(156, 39, 176, 0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .ip-address {
+                font-size: 18px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎮</div>
+        <div class="status">● Сервер онлайн</div>
+        <h1>Подключение к серверу Garry's Mod</h1>
+        
+        <div class="server-info">
+            <h2>📡 Информация о сервере:</h2>
+            <p><strong>Название:</strong> Indiana GMod Server</p>
+            <p><strong>Игра:</strong> Garry's Mod</p>
+            <p><strong>Карта:</strong> bangclaw_indiana</p>
+        </div>
+        
+        <h2>IP-адрес сервера:</h2>
+        <div class="ip-address" id="ipText">62.122.214.229:27015</div>
+        <div>
+            <button class="copy-btn" onclick="copyIP()">📋 Копировать IP</button>
+        </div>
+        
+        <button class="connect-btn" onclick="connectToServer()">
+            🔗 Подключиться к серверу
+        </button>
+        
+        <div class="instructions">
+            <h2>📝 Инструкция по подключению:</h2>
+            <ol>
+                <li>Нажмите кнопку "Подключиться к серверу" выше</li>
+                <li>Если Steam откроется — нажмите "Подключиться" в окне GMod</li>
+                <li>Если автоматическое подключение не сработало:</li>
+                <li>Запустите Garry's Mod</li>
+                <li>Нажмите <kbd>~</kbd> (тильда) чтобы открыть консоль</li>
+                <li>Введите команду: <code>connect 62.122.214.229:27015</code></li>
+                <li>Нажмите Enter для подключения</li>
+            </ol>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 Indiana GMod Server | Страница автоматического подключения</p>
+            <p>Убедитесь, что у вас установлены Steam и Garry's Mod</p>
+        </div>
+    </div>
+
+    <script>
+        // IP адрес сервера
+        const SERVER_IP = "62.122.214.229:27015";
+        
+        // Автоматическое перенаправление при загрузке
+        setTimeout(function() {
+            window.location.href = "steam://connect/" + SERVER_IP;
+        }, 1500);
+        
+        function connectToServer() {
+            // Попытка открыть через Steam
+            window.location.href = "steam://connect/" + SERVER_IP;
+            
+            // Резервное уведомление
+            setTimeout(function() {
+                if (!document.hidden) {
+                    alert("Если GMod не открылся:\n\n1. Убедитесь, что Steam запущен\n2. Скопируй команду в консоль GMod:\n\nconnect " + SERVER_IP);
+                }
+            }, 2000);
+        }
+        
+        function copyIP() {
+            const ipText = document.getElementById('ipText').textContent;
+            navigator.clipboard.writeText(ipText)
+                .then(() => {
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = '✓ Скопировано!';
+                    btn.style.background = 'linear-gradient(45deg, #8e24aa, #6a1b9a)';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                    }, 2000);
+                })
+                .catch(err => {
+                    alert('Не удалось скопировать. Скопируйте вручную: ' + ipText);
+                });
+        }
+        
+        // Проверка видимости страницы для определения успешности редиректа
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('Страница скрыта - редирект сработал');
+            }
+        });
+    </script>
+</body>
+</html>
